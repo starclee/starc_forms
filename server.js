@@ -13,7 +13,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Initialize Postgres database table
-(async () => {
+let dbInitialized = false;
+
+async function initializeDatabase() {
+    if (dbInitialized) return;
     try {
         const client = new Client({
             connectionString: process.env.POSTGRES_URL,
@@ -28,16 +31,19 @@ app.use(express.static(path.join(__dirname, 'public')));
             country VARCHAR(100)
         );`);
         await client.end();
+        dbInitialized = true;
         console.log("Database table initialized.");
     } catch (error) {
         console.error("Failed to initialize database:", error);
     }
-})();
+}
 
 // Route: Handle form submission
 app.post('/submit', async (req, res) => {
     const { name, phone, email, city, country } = req.body;
     
+    await initializeDatabase();
+
     try {
         const client = new Client({
             connectionString: process.env.POSTGRES_URL,
@@ -64,6 +70,8 @@ app.post('/submit', async (req, res) => {
 
 // Route: API endpoint to fetch all stored data for the admin page
 app.get('/api/submissions', async (req, res) => {
+    await initializeDatabase();
+
     try {
         const client = new Client({
             connectionString: process.env.POSTGRES_URL,

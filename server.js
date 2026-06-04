@@ -85,6 +85,21 @@ app.get('/api/submissions', async (req, res) => {
     }
 });
 
+// Route: API endpoint to reset (clear) all data
+app.delete('/api/submissions', async (req, res) => {
+    try {
+        const client = new Client({
+            connectionString: process.env.POSTGRES_URL,
+        });
+        await client.connect();
+        await client.query(`TRUNCATE TABLE submissions`);
+        await client.end();
+        res.json({ message: "All submissions have been reset." });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 // Start the server (only if not running in Vercel's serverless environment)
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

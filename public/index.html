@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Information Form</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#673ab7">
     <style>
         body { background-color: #f0ebf8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
         .form-container { background: white; max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-top: 8px solid #673ab7; }
@@ -58,6 +60,14 @@
     <!-- <div class="footer">
         <a href="/admin.html">Admin Login (View Data)</a>
     </div> -->
+
+    <script>
+        // Register the service worker to make the app installable
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker Registered'));
+        }
+    </script>
 
 </body>
 </html>

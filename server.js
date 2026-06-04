@@ -1,5 +1,5 @@
 const express = require('express');
-const { sql } = require('@vercel/postgres');
+const { createClient } = require('@vercel/postgres');
 const path = require('path');
 
 const app = express();
@@ -15,7 +15,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Initialize Postgres database table
 (async () => {
     try {
-        await sql`CREATE TABLE IF NOT EXISTS submissions (
+        const client = createClient();
+        await client.connect();
+        await client.sql`CREATE TABLE IF NOT EXISTS submissions (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255),
             phone VARCHAR(50),
@@ -23,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
             city VARCHAR(100),
             country VARCHAR(100)
         );`;
+        await client.end();
         console.log("Database table initialized.");
     } catch (error) {
         console.error("Failed to initialize database:", error);
@@ -34,7 +37,10 @@ app.post('/submit', async (req, res) => {
     const { name, phone, email, city, country } = req.body;
     
     try {
-        await sql`INSERT INTO submissions (name, phone, email, city, country) VALUES (${name}, ${phone}, ${email}, ${city}, ${country})`;
+        const client = createClient();
+        await client.connect();
+        await client.sql`INSERT INTO submissions (name, phone, email, city, country) VALUES (${name}, ${phone}, ${email}, ${city}, ${country})`;
+        await client.end();
         
         // Send a simple success response
         res.send(`
@@ -52,7 +58,10 @@ app.post('/submit', async (req, res) => {
 // Route: API endpoint to fetch all stored data for the admin page
 app.get('/api/submissions', async (req, res) => {
     try {
-        const { rows } = await sql`SELECT * FROM submissions ORDER BY id DESC`;
+        const client = createClient();
+        await client.connect();
+        const { rows } = await client.sql`SELECT * FROM submissions ORDER BY id DESC`;
+        await client.end();
         res.json(rows);
     } catch (err) {
         return res.status(500).json({ error: err.message });

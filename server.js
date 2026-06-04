@@ -15,7 +15,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Initialize Postgres database table
 (async () => {
     try {
-        const client = createClient();
+        const client = createClient({
+            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+        });
         await client.connect();
         await client.sql`CREATE TABLE IF NOT EXISTS submissions (
             id SERIAL PRIMARY KEY,
@@ -37,7 +39,9 @@ app.post('/submit', async (req, res) => {
     const { name, phone, email, city, country } = req.body;
     
     try {
-        const client = createClient();
+        const client = createClient({
+            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+        });
         await client.connect();
         await client.sql`INSERT INTO submissions (name, phone, email, city, country) VALUES (${name}, ${phone}, ${email}, ${city}, ${country})`;
         await client.end();
@@ -58,7 +62,9 @@ app.post('/submit', async (req, res) => {
 // Route: API endpoint to fetch all stored data for the admin page
 app.get('/api/submissions', async (req, res) => {
     try {
-        const client = createClient();
+        const client = createClient({
+            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+        });
         await client.connect();
         const { rows } = await client.sql`SELECT * FROM submissions ORDER BY id DESC`;
         await client.end();

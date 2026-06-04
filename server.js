@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 (async () => {
     try {
         const client = createClient({
-            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+            connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
         await client.sql`CREATE TABLE IF NOT EXISTS submissions (
@@ -40,7 +40,7 @@ app.post('/submit', async (req, res) => {
     
     try {
         const client = createClient({
-            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+            connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
         await client.sql`INSERT INTO submissions (name, phone, email, city, country) VALUES (${name}, ${phone}, ${email}, ${city}, ${country})`;
@@ -63,7 +63,7 @@ app.post('/submit', async (req, res) => {
 app.get('/api/submissions', async (req, res) => {
     try {
         const client = createClient({
-            connectionString: process.env.POSTGRES_URL_NON_POOLING,
+            connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
         const { rows } = await client.sql`SELECT * FROM submissions ORDER BY id DESC`;

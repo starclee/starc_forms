@@ -50,7 +50,7 @@ app.post('/submit', async (req, res) => {
         });
         await client.connect();
         await client.query(
-            `INSERT INTO submissions (name, phone, email, city, country) VALUES ($1, $2, $3, $4, $5)`,
+            `INSERT INTO submissions (name, phone, email, city, country, created_at) VALUES ($1, $2, $3, $4, $5, NOW()`,
             [name, phone, email, city, country]
         );
         await client.end();
@@ -77,7 +77,7 @@ app.get('/api/submissions', async (req, res) => {
             connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
-        const { rows } = await client.query(`SELECT * FROM submissions ORDER BY id DESC`);
+        const { rows } = await client.query(`SELECT * FROM submissions ORDER BY id ASC`);
         await client.end();
         res.json(rows);
     } catch (err) {

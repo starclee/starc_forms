@@ -42,7 +42,7 @@ async function initializeDatabase() {
 // Route: Handle form submission
 app.post('/submit', async (req, res) => {
     const { name, phone, email, city, country } = req.body;
-    
+
     await initializeDatabase();
 
     try {
@@ -55,7 +55,7 @@ app.post('/submit', async (req, res) => {
             [name, phone, email, city, country]
         );
         await client.end();
-        
+
         // Send a simple success response
         res.send(`
             <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
@@ -93,7 +93,7 @@ app.delete('/api/submissions', async (req, res) => {
             connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
-        await client.query(`TRUNCATE TABLE submissions`);
+        await client.query(`TRUNCATE TABLE submissions RESTART IDENTITY`);
         await client.end();
         res.json({ message: "All submissions have been reset." });
     } catch (err) {

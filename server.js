@@ -28,7 +28,8 @@ async function initializeDatabase() {
             phone VARCHAR(50),
             email VARCHAR(255),
             city VARCHAR(100),
-            country VARCHAR(100)
+            country VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
         await client.end();
         dbInitialized = true;
@@ -50,7 +51,7 @@ app.post('/submit', async (req, res) => {
         });
         await client.connect();
         await client.query(
-            `INSERT INTO submissions (name, phone, email, city, country, created_at) VALUES ($1, $2, $3, $4, $5, NOW()`,
+            `INSERT INTO submissions (name, phone, email, city, country, created_at) VALUES ($1, $2, $3, $4, $5, NOW())`,
             [name, phone, email, city, country]
         );
         await client.end();

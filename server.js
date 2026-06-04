@@ -1,5 +1,5 @@
 const express = require('express');
-const { createClient } = require('@vercel/postgres');
+const { Client } = require('pg');
 const path = require('path');
 
 const app = express();
@@ -15,18 +15,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Initialize Postgres database table
 (async () => {
     try {
-        const client = createClient({
+        const client = new Client({
             connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
-        await client.sql`CREATE TABLE IF NOT EXISTS submissions (
+        await client.query(`CREATE TABLE IF NOT EXISTS submissions (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255),
             phone VARCHAR(50),
             email VARCHAR(255),
             city VARCHAR(100),
             country VARCHAR(100)
-        );`;
+        );`);
         await client.end();
         console.log("Database table initialized.");
     } catch (error) {
@@ -39,11 +39,14 @@ app.post('/submit', async (req, res) => {
     const { name, phone, email, city, country } = req.body;
     
     try {
-        const client = createClient({
+        const client = new Client({
             connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
-        await client.sql`INSERT INTO submissions (name, phone, email, city, country) VALUES (${name}, ${phone}, ${email}, ${city}, ${country})`;
+        await client.query(
+            `INSERT INTO submissions (name, phone, email, city, country) VALUES ($1, $2, $3, $4, $5)`,
+            [name, phone, email, city, country]
+        );
         await client.end();
         
         // Send a simple success response
@@ -62,11 +65,11 @@ app.post('/submit', async (req, res) => {
 // Route: API endpoint to fetch all stored data for the admin page
 app.get('/api/submissions', async (req, res) => {
     try {
-        const client = createClient({
+        const client = new Client({
             connectionString: process.env.POSTGRES_URL,
         });
         await client.connect();
-        const { rows } = await client.sql`SELECT * FROM submissions ORDER BY id DESC`;
+        const { rows } = await client.query(`SELECT * FROM submissions ORDER BY id DESC`);
         await client.end();
         res.json(rows);
     } catch (err) {

@@ -1,0 +1,10 @@
+{
+    "appId": "com.contactapp.admin",
+    "appName": "LeadGen",
+    "webDir": "public",
+    "bundledWebRuntime": false,
+    "server": {
+        "url": "https://project-as5ri.vercel.app",
+        "cleartext": true
+    }
+}
